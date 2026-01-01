@@ -1,0 +1,168 @@
+[
+    {
+      "title": "Handling JWT Authentication in Node.js",
+      "subtitle": "Learn how to implement JWT authentication in your Node.js applications to secure API endpoints and manage user sessions effectively.",
+      "slug": "handling-jwt-authentication-in-nodejs",
+      "thumbnail": "nodejs-thumbnail.jpg",
+      "views": 256,
+      "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam...",
+      "author": "615b71fc2f9d6e001fd99e41",
+      "tags": ["Node.js", "Authentication", "JWT"],
+      "published": true
+    },
+    {
+      "title": "Optimizing React.js Performance",
+      "subtitle": "Discover advanced techniques to improve the performance of your React.js applications and deliver a smoother user experience.",
+      "slug": "optimizing-reactjs-performance",
+      "thumbnail": "reactjs-thumbnail.jpg",
+      "views": 134,
+      "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam...",
+      "author": "615b71fc2f9d6e001fd99e41",
+      "tags": ["React.js", "Performance", "Optimization"],
+      "published": true
+    },
+    {
+      "title": "Securing REST APIs in Express.js",
+      "subtitle": "Learn best practices for securing your Express.js REST APIs from common vulnerabilities and attacks.",
+      "slug": "securing-rest-apis-in-expressjs",
+      "thumbnail": "expressjs-thumbnail.jpg",
+      "views": 189,
+      "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam...",
+      "author": "615b71fc2f9d6e001fd99e41",
+      "tags": ["Express.js", "REST API", "Security"],
+      "published": true
+    },
+    {
+      "title": "Managing State in React.js with Redux",
+      "subtitle": "Learn how to use Redux to manage complex state in your React.js applications and simplify data flow.",
+      "slug": "managing-state-in-reactjs-with-redux",
+      "thumbnail": "redux-thumbnail.jpg",
+      "views": 312,
+      "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam...",
+      "author": "615b71fc2f9d6e001fd99e41",
+      "tags": ["React.js", "Redux", "State Management"],
+      "published": true
+    },
+    {
+      "title": "Debugging Node.js Applications",
+      "subtitle": "Master the art of debugging Node.js applications using popular tools and techniques to quickly identify and fix issues.",
+      "slug": "debugging-nodejs-applications",
+      "thumbnail": "nodejs-debugging-thumbnail.jpg",
+      "views": 75,
+      "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam...",
+      "author": "615b71fc2f9d6e001fd99e41",
+      "tags": ["Node.js", "Debugging", "Tools"],
+      "published": true
+    },
+    {
+      "title": "Advanced Routing in React Router",
+      "subtitle": "Explore advanced routing techniques in React Router to create dynamic and nested routes in your React.js applications.",
+      "slug": "advanced-routing-in-react-router",
+      "thumbnail": "react-router-thumbnail.jpg",
+      "views": 102,
+      "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam...",
+      "author": "615b71fc2f9d6e001fd99e41",
+      "tags": ["React Router", "Routing", "React.js"],
+      "published": true
+    },
+    {
+      "title": "Testing Node.js Applications with Jest",
+      "subtitle": "Learn how to use Jest to write unit and integration tests for your Node.js applications and ensure their reliability.",
+      "slug": "testing-nodejs-applications-with-jest",
+      "thumbnail": "jest-thumbnail.jpg",
+      "views": 123,
+      "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam...",
+      "author": "615b71fc2f9d6e001fd99e41",
+      "tags": ["Node.js", "Testing", "Jest"],
+      "published": true
+    },
+    {
+      "title": "Building a RESTful API with Express.js",
+      "subtitle": "Step-by-step guide to building a RESTful API using Express.js, including routes, controllers, and middleware.",
+      "slug": "building-restful-api-with-expressjs",
+      "thumbnail": "expressjs-rest-thumbnail.jpg",
+      "views": 189,
+      "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam...",
+      "author": "615b71fc2f9d6e001fd99e41",
+      "tags": ["Express.js", "REST API", "Node.js"],
+      "published": true
+    },
+    {
+      "title": "State Management in Angular",
+      "subtitle": "Explore various state management techniques in Angular, including services, observables, and NgRx, to manage application state efficiently.",
+      "slug": "state-management-in-angular",
+      "thumbnail": "angular-state-management-thumbnail.jpg",
+      "views": 87,
+      "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam...",
+      "author": "615b71fc2f9d6e001fd99e41",
+      "tags": ["Angular", "State Management", "NgRx"],
+      "published": true
+    },
+    {
+      "title": "Introduction to GraphQL",
+      "subtitle": "Learn the basics of GraphQL and how to use it to build efficient and flexible APIs for your web applications.",
+      "slug": "introduction-to-graphql",
+      "thumbnail": "graphql-thumbnail.jpg",
+      "views": 189,
+      "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam...",
+      "author": "615b71fc2f9d6e001fd99e41",
+      "tags": ["GraphQL", "APIs", "Web Development"],
+      "published": true
+    },
+    {
+      "title": "Securing React.js Applications",
+      "subtitle": "Discover best practices for securing your React.js applications from common security vulnerabilities and attacks.",
+      "slug": "securing-reactjs-applications",
+      "thumbnail": "reactjs-security-thumbnail.jpg",
+      "views": 134,
+      "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam...",
+      "author": "615b71fc2f9d6e001fd99e41",
+      "tags": ["React.js", "Security", "Best Practices"],
+      "published": true
+    },
+    {
+      "title": "Scaling Node.js Applications",
+      "subtitle": "Learn how to scale your Node.js applications to handle increased traffic and workload using clustering, load balancing, and other techniques.",
+      "slug": "scaling-nodejs-applications",
+      "thumbnail": "nodejs-scaling-thumbnail.jpg",
+      "views": 189,
+      "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam...",
+      "author": "615b71fc2f9d6e001fd99e41",
+      "tags": ["Node.js", "Scaling", "Performance"],
+      "published": true
+    },
+    {
+      "title": "Building Real-time Chat Applications with Socket.IO",
+      "subtitle": "Learn how to create real-time chat applications using Socket.IO and Node.js to enable instant messaging and communication.",
+      "slug": "building-realtime-chat-apps-with-socketio",
+      "thumbnail": "socketio-chat-thumbnail.jpg",
+      "views": 189,
+      "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam...",
+      "author": "615b71fc2f9d6e001fd99e41",
+      "tags": ["Node.js", "Socket.IO", "Real-time"],
+      "published": true
+    },
+    {
+      "title": "Serverless Computing with AWS Lambda and Node.js",
+      "subtitle": "Learn how to build serverless applications using AWS Lambda and Node.js, and deploy them on the AWS cloud infrastructure.",
+      "slug": "serverless-computing-with-aws-lambda-and-nodejs",
+      "thumbnail": "aws-lambda-thumbnail.jpg",
+      "views": 189,
+      "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam...",
+      "author": "615b71fc2f9d6e001fd99e41",
+      "tags": ["AWS Lambda", "Serverless", "Node.js"],
+      "published": true
+    },
+    {
+      "title": "Getting Started with Next.js",
+      "subtitle": "Kickstart your Next.js journey with this comprehensive guide covering setup, routing, data fetching, and deployment.",
+      "slug": "getting-started-with-nextjs",
+      "thumbnail": "nextjs-thumbnail.jpg",
+      "views": 189,
+      "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam...",
+      "author": "615b71fc2f9d6e001fd99e41",
+      "tags": ["Next.js", "React.js", "Frontend"],
+      "published": true
+    }
+  ]
+  
