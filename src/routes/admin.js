@@ -1,9 +1,6 @@
 import express from 'express';
 import { userController } from '../controllers/userController.js';
 import { adminAuth } from '../middlewares/auth.js';
-import { adminController } from '../controllers/adminController.js';
-import { uploadFile } from '../utils/fileStorage.js';
-import { authController } from '../controllers/authController.js';
 import { attendanceController } from '../controllers/attendanceController.js';
 
 const router = express.Router();

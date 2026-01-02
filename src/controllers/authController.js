@@ -1,7 +1,5 @@
 import User from '../models/user.js';
 import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
-
 import {
   generateAuthToken,
   generateEmailToken,
@@ -251,24 +249,6 @@ export const authController = {
       await otpEntry.save();
 
       Response(res, 'Password reset successful');
-    } catch (e) {
-      next(e);
-    }
-  },
-
-  uploadFile: async (req, res, next) => {
-    try {
-      if (!req.file) throw CustomError.badRequest('No file uploaded');
-
-      const fileName = `${Date.now()}-${req.file.originalname}`;
-
-      const uploaded = await uploadFile(req.file.buffer, fileName);
-
-      Response(res, 'File uploaded successfully', {
-        url: uploaded.url,
-        thumbnail: uploaded.thumbnailUrl,
-        fileId: uploaded.fileId,
-      });
     } catch (e) {
       next(e);
     }

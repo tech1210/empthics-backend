@@ -2,10 +2,9 @@ import express from 'express';
 import { userController } from '../controllers/userController.js';
 import { authController } from '../controllers/authController.js';
 import { auth } from '../middlewares/auth.js';
-import { attendanceController } from '../controllers/attendanceController.js';
 import { employeeController } from '../controllers/employeeController.js';
-import { upload } from '../middlewares/upload.js';
 import { uploadController } from '../controllers/uploadController.js';
+import { uploadS3File } from '../utils/s3Upload.js';
 
 const router = express.Router();
 
@@ -54,13 +53,10 @@ router.put('/updateBankDetails', auth, employeeController.updateBankDetails);
 // @access   PRIVATE
 router.put('/updateExperience', auth, employeeController.updateExperience);
 
-// @route    POST /uploadFile
-// @desc     Upload file to ImageKit
-// @access   PRIVATE
 router.post(
   '/uploadFile',
   auth,
-  upload.single('file'),
+  uploadS3File.single('file'),
   uploadController.uploadFile
 );
 
