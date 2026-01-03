@@ -63,8 +63,7 @@ export const authController = {
       const userData = JSON.parse(JSON.stringify(newUser));
       userData.token = await generateAuthToken(userData._id);
 
-      // const verificationUrl = `${process.env.BACKEND_URL}/api/auth/verifyEmail?token=${token}`;
-      const verificationUrl = `https://api.empthics.com/api/auth/verifyEmail?token=${token}`;
+      const verificationUrl = `${process.env.WEB_URL}?token=${token}`;
 
       let htmlContent = organizationEmailVerificationTemplate(
         name,
@@ -116,9 +115,9 @@ export const authController = {
 
       await user.save();
 
-      res.redirect(`${process.env.WEB_URL}/login`);
+      // res.redirect(`${process.env.WEB_URL}/login`);
 
-      // return Response(res, 'Email verified successfully. You can now login.');
+      return Response(res, 'Email verified successfully. You can now login.');
     } catch (e) {
       next(e);
     }

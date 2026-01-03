@@ -24,7 +24,7 @@ const UserSchema = new Schema(
       default: UserStatus.ACTIVE,
       required: true,
     },
-    emailVerified: { type: Boolean, default: false },
+    emailVerified: { type: Boolean, default: true },
     emailVerificationToken: { type: String },
     emailVerificationExpires: { type: Date },
   },
