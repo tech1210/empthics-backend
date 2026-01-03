@@ -63,7 +63,8 @@ export const authController = {
       const userData = JSON.parse(JSON.stringify(newUser));
       userData.token = await generateAuthToken(userData._id);
 
-      const verificationUrl = `${process.env.BACKEND_URL}/api/auth/verifyEmail?token=${token}`;
+      // const verificationUrl = `${process.env.BACKEND_URL}/api/auth/verifyEmail?token=${token}`;
+      const verificationUrl = `https://api.empthics.com/api/auth/verifyEmail?token=${token}`;
 
       let htmlContent = organizationEmailVerificationTemplate(
         name,

@@ -37,6 +37,10 @@ app.get('/health', (req, res) => {
   res.status(200).send('API Running...');
 });
 
+app.get('/testsec', (req, res) => {
+  res.status(200).send(process.env);
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
