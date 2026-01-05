@@ -65,7 +65,7 @@ export const authController = {
       const userData = JSON.parse(JSON.stringify(newUser));
       userData.token = await generateAuthToken(userData._id);
 
-      const verificationUrl = `${process.env.WEB_URL}?token=${token}`;
+      const verificationUrl = `${process.env.WEB_URL}`;
 
       let htmlContent = organizationEmailVerificationTemplate(
         name,
