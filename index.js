@@ -11,7 +11,7 @@ import authRoutes from './src/routes/auth.js';
 import userRoutes from './src/routes/user.js';
 import adminRoutes from './src/routes/admin.js';
 
-import { limiter } from './src/utils/index.js';
+// import { limiter } from './src/utils/index.js';
 import connectToMongo from './src/db.js';
 let PORT = process.env.PORT || 5000;
 const app = express();
@@ -26,7 +26,7 @@ app.use(cors());
 app.use(logger('dev'));
 app.use(helmet());
 app.use(compression());
-app.use(limiter);
+// app.use(limiter);
 
 // Base route
 app.get('/', (req, res) => {

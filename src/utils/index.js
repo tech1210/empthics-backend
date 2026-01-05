@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../configs/index.js';
-import { rateLimit } from 'express-rate-limit';
+// import { rateLimit } from 'express-rate-limit';
 import * as crypto from 'crypto';
 
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -32,18 +32,18 @@ export const slugify = (title) => {
     .replace(/^-|-$/g, '');
 };
 
-export const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 100,
-  standardHeaders: 'draft-7',
-  legacyHeaders: false,
-  handler: (req, res) => {
-    res.status(429).json({
-      status: 429,
-      message: 'Too many requests, please try again later.',
-    });
-  },
-});
+// export const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000,
+//   limit: 100,
+//   standardHeaders: 'draft-7',
+//   legacyHeaders: false,
+//   handler: (req, res) => {
+//     res.status(429).json({
+//       status: 429,
+//       message: 'Too many requests, please try again later.',
+//     });
+//   },
+// });
 
 export const generateLoginId = () => {
   const bytes = crypto.randomBytes(6);
