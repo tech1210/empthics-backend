@@ -2,6 +2,7 @@ import express from 'express';
 import { userController } from '../controllers/userController.js';
 import { adminAuth } from '../middlewares/auth.js';
 import { attendanceController } from '../controllers/attendanceController.js';
+import { adminController } from '../controllers/adminController.js';
 
 const router = express.Router();
 
@@ -22,6 +23,12 @@ router.get(
   '/getDashboardSummary',
   adminAuth,
   attendanceController.getDashboardSummary
+);
+
+router.get(
+  '/bulkUploadHolidays',
+  adminAuth,
+  adminController.bulkUploadHolidays
 );
 
 //@route    GET /getAllAttendance

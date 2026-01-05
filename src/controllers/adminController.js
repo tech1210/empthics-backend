@@ -1,42 +1,74 @@
 import Attendance from '../models/attendance.js';
+import Holiday from '../models/holiday.js';
 import { Response } from '../utils/index.js';
 
 export const adminController = {
-  getDashboardSummary: async (req, res, next) => {
+  /**
+   * =============================
+   *  HOLIDAY - BULK UPLOAD (ADMIN)
+   *  FORMAT: YYYY-MM-DD ONLY
+   * =============================
+   */
+  bulkUploadHolidays: async (req, res, next) => {
     try {
-      // Get total employees (excluding superadmins/organizations if you want)
-      const totalEmployees = await User.countDocuments({ role: 'employee' });
+      const { orgId, holidays } = req.body;
 
-      // Date range for today
-      const today = new Date();
-      const startOfDay = new Date(today.setHours(0, 0, 0, 0));
-      const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+      if (!orgId) throw CustomError.badRequest('orgId is required');
+      if (!holidays || !Array.isArray(holidays) || holidays.length === 0)
+        throw CustomError.badRequest('holidays array is required');
 
-      // Employees who punched in today
-      const presentToday = await Attendance.distinct('user', {
-        punchIn: { $gte: startOfDay, $lte: endOfDay },
+      const savedList = [];
+
+      for (let h of holidays) {
+        if (!h.name || !h.fromDate || !h.toDate)
+          throw CustomError.badRequest(
+            'Each holiday must contain name, fromDate, toDate (yyyy-mm-dd)'
+          );
+
+        const fromDate = new Date(h.fromDate);
+        const toDate = new Date(h.toDate);
+
+        if (isNaN(fromDate) || isNaN(toDate))
+          throw CustomError.badRequest(
+            `Invalid date format in holiday: ${h.name}. Use YYYY-MM-DD`
+          );
+
+        if (toDate < fromDate)
+          throw CustomError.badRequest(
+            `toDate cannot be smaller than fromDate for ${h.name}`
+          );
+
+        try {
+          const saved = await Holiday.findOneAndUpdate(
+            {
+              orgId,
+              fromDate,
+              toDate,
+            },
+            {
+              orgId,
+              name: h.name,
+              fromDate,
+              toDate,
+              year: fromDate.getFullYear(),
+              description: h.description || '',
+              isActive: true,
+            },
+            { upsert: true, new: true }
+          );
+
+          savedList.push(saved);
+        } catch (err) {
+          console.log('Skipped holiday (probably duplicate):', h.name);
+        }
+      }
+
+      return Response(res, 'Holidays uploaded successfully', {
+        totalSaved: savedList.length,
+        holidays: savedList,
       });
-
-      // On leave (stub → depends on Leave model)
-      const onLeave = 0; // await Leave.countDocuments({ date: { $gte: startOfDay, $lte: endOfDay }, status: 'Approved' });
-
-      // Pending leave requests (stub)
-      const pendingRequests = 0; // await Leave.countDocuments({ status: 'Pending' });
-
-      // Get employee list (latest 20)
-      const employeeList = await User.find({ role: 'employee' })
-        .sort({ createdAt: -1 })
-        .limit(20);
-
-      return Response(res, 'Dashboard data fetched successfully', {
-        totalEmployees,
-        presentToday: presentToday.length,
-        onLeave,
-        pendingRequests,
-        employeeList,
-      });
-    } catch (err) {
-      next(err);
+    } catch (e) {
+      next(e);
     }
   },
 };
