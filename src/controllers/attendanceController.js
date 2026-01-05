@@ -8,49 +8,74 @@ import moment from 'moment-timezone';
 
 const IST = 'Asia/Kolkata';
 
-const formatTime = (date) => {
-  if (!date) return '';
-  return moment(date).tz(IST).format('hh:mm a');
-};
+// --------------------------------------
+// HOLIDAYS SUPPORTING FROM - TO RANGE
+// --------------------------------------
+export const HOLIDAYS = [
+  { name: 'New Year', fromDate: '2026-01-01', toDate: '2026-01-01' },
+  { name: 'Republic Day', fromDate: '2026-01-26', toDate: '2026-01-26' },
+  { name: 'Holi', fromDate: '2026-03-04', toDate: '2026-03-04' },
+  { name: 'Ram Navmi', fromDate: '2026-03-27', toDate: '2026-03-27' },
+  { name: 'Raksha Bandhan', fromDate: '2026-08-28', toDate: '2026-08-28' },
+  { name: 'Independence Day', fromDate: '2026-08-15', toDate: '2026-08-15' },
+  { name: 'Janmashtami', fromDate: '2026-09-04', toDate: '2026-09-04' },
+  { name: 'Gandhi Jayanti', fromDate: '2026-10-02', toDate: '2026-10-02' },
+  { name: 'Dussehra', fromDate: '2026-10-20', toDate: '2026-10-22' },
+  { name: 'Gurunanak Birthday', fromDate: '2026-11-05', toDate: '2026-11-05' },
+  { name: 'Diwali', fromDate: '2026-11-08', toDate: '2026-11-08' },
+  { name: 'Bhai Dooj', fromDate: '2026-11-11', toDate: '2026-11-11' },
+  { name: 'Chhath Pooja', fromDate: '2026-11-16', toDate: '2026-11-16' },
+  { name: 'Christmas', fromDate: '2026-12-25', toDate: '2026-12-25' },
+];
 
-const formatDate = (date) => {
-  if (!date) return '';
-  return moment(date).tz(IST).format('DD/MM/YYYY');
-};
-
-// ===============================
-// FINAL FIXED DURATION FUNCTION
-// ===============================
-const calculateTotalHours = (inTime, outTime) => {
-  if (!inTime || !outTime) return '0h 0m';
-
-  const start = moment(inTime).tz(IST).seconds(0).milliseconds(0);
-  const end = moment(outTime).tz(IST).seconds(0).milliseconds(0);
-
-  const duration = moment.duration(end.diff(start));
-  const totalMinutes = duration.asMinutes();
-
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = Math.floor(totalMinutes % 60);
-
-  return `${hours}h ${minutes}m`;
-};
-
-const SHIFT_START_TIME = '09:30';
+// --------------------------------------
+// HELPERS
+// --------------------------------------
+const SHIFT_START_TIME = '10:00';
 const HALF_DAY_HOURS = 4;
 
-const isWeekend = (date) => {
-  const day = date.getDay();
-  return day === 0;
+// remove seconds
+const normalize = (date) =>
+  moment(date).tz(IST).seconds(0).milliseconds(0).toDate();
+
+const formatTime = (date) =>
+  date ? moment(date).tz(IST).format('hh:mm a') : '';
+
+const formatDate = (date) =>
+  date ? moment(date).tz(IST).format('DD/MM/YYYY') : '';
+
+const calculateTotalHours = (inTime, outTime) => {
+  if (!inTime || !outTime) return '0h 0m';
+  const start = normalize(inTime);
+  const end = normalize(outTime);
+
+  const duration = moment.duration(moment(end).diff(moment(start)));
+  const minutes = parseInt(duration.asMinutes(), 10);
+
+  return `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
 };
 
+const isSunday = (date) => moment(date).tz(IST).day() === 0;
+
+const isHoliday = (date) => {
+  const today = moment(date).tz(IST).format('YYYY-MM-DD');
+  return HOLIDAYS.some((h) => {
+    const from = moment(h.fromDate).format('YYYY-MM-DD');
+    const to = moment(h.toDate).format('YYYY-MM-DD');
+    return today >= from && today <= to;
+  });
+};
+
+// ================================================================
+// CONTROLLER
+// ================================================================
 export const attendanceController = {
   // 🔹 Punch In/Out
   markAttendance: async (req, res, next) => {
     try {
       const { latitude, longitude, address } = req.body;
       const userId = req.user._id;
-      const now = new Date();
+      const now = normalize(new Date());
 
       if (!latitude || !longitude || !address)
         throw CustomError.badRequest(
@@ -62,35 +87,37 @@ export const attendanceController = {
         punchOut: { $exists: false },
       }).sort({ createdAt: -1 });
 
-      const isRecordFromToday =
-        openRecord && openRecord.punchIn.toDateString() === now.toDateString();
-
-      if (isRecordFromToday) {
-        openRecord.punchOut = now;
-        openRecord.punchOutLocation = { latitude, longitude, address };
-        await openRecord.save();
-        return Response(res, 'Punched out successfully.');
-      }
+      const todayStr = moment(now).tz(IST).format('YYYY-MM-DD');
 
       if (openRecord) {
+        const recordDay = moment(openRecord.punchIn)
+          .tz(IST)
+          .format('YYYY-MM-DD');
+
+        if (recordDay === todayStr) {
+          openRecord.punchOut = now;
+          openRecord.punchOutLocation = { latitude, longitude, address };
+          await openRecord.save();
+          return Response(res, 'Punched out successfully.');
+        }
+
         openRecord.status = 'Absent';
         await openRecord.save();
       }
 
-      const punchInRecord = new Attendance({
+      await Attendance.create({
         user: userId,
         punchIn: now,
         punchInLocation: { latitude, longitude, address },
       });
 
-      await punchInRecord.save();
       return Response(res, 'Punched in successfully.');
     } catch (e) {
       next(e);
     }
   },
 
-  // 🔹 Attendance Summary for logged-in employee (FIXED)
+  // 🔹 Attendance Summary for logged-in employee (unchanged UI but more accurate)
   getAttendanceSummary: async (req, res, next) => {
     try {
       const userId = req.user._id;
@@ -122,17 +149,12 @@ export const attendanceController = {
 
       const totalRecords = await Attendance.countDocuments(filter);
 
-      // ===============================
-      // FINAL FIX PAGE TOTAL DURATION
-      // ===============================
       let totalMinutes = 0;
-
       attendanceRecords.forEach((rec) => {
         if (rec.punchIn && rec.punchOut) {
-          const s = moment(rec.punchIn).tz(IST).seconds(0).milliseconds(0);
-          const e = moment(rec.punchOut).tz(IST).seconds(0).milliseconds(0);
-
-          totalMinutes += e.diff(s, 'minutes');
+          const s = normalize(rec.punchIn);
+          const e = normalize(rec.punchOut);
+          totalMinutes += (e - s) / 60000;
         }
       });
 
@@ -179,7 +201,7 @@ export const attendanceController = {
     }
   },
 
-  // 🔹 Dashboard Summary
+  // 🔹 Dashboard Summary (unchanged)
   getDashboardSummary: async (req, res, next) => {
     try {
       const totalEmployees = await Employee.countDocuments({
@@ -216,7 +238,7 @@ export const attendanceController = {
     }
   },
 
-  // 🔹 Get All Attendance
+  // 🔹 Get All Attendance (unchanged display but accurate hours)
   getAllAttendance: async (req, res, next) => {
     try {
       const {
@@ -296,15 +318,17 @@ export const attendanceController = {
     }
   },
 
-  // 🔹 Daily Attendance Report
+  // 🔹 DAILY REPORT (Holiday + Sunday + Late + Half Day)
   getDailyAttendanceReport: async (req, res, next) => {
     try {
       const { date, search } = req.query;
       const orgId = req.user._id;
 
       const targetDate = date ? new Date(date) : new Date();
-      const startOfDay = new Date(targetDate.setHours(0, 0, 0, 0));
-      const endOfDay = new Date(targetDate.setHours(23, 59, 59, 999));
+      const startOfDay = normalize(new Date(targetDate.setHours(0, 0, 0, 0)));
+      const endOfDay = normalize(
+        new Date(targetDate.setHours(23, 59, 59, 999))
+      );
 
       let employeeQuery = { orgId, status: 'Active' };
       if (search) employeeQuery.name = { $regex: search, $options: 'i' };
@@ -352,7 +376,9 @@ export const attendanceController = {
           status: emp.status,
         };
 
-        if (onLeave) {
+        if (isSunday(startOfDay) || isHoliday(startOfDay)) {
+          status = 'Holiday';
+        } else if (onLeave) {
           status = 'On Leave';
         } else if (attendance) {
           presentCount++;
@@ -362,20 +388,17 @@ export const attendanceController = {
           const shiftTime = new Date(startOfDay);
           shiftTime.setHours(sh, sm, 0, 0);
 
-          if (attendance.punchIn > shiftTime) {
+          if (normalize(attendance.punchIn) > normalize(shiftTime)) {
             status = 'Late';
             lateCount++;
           }
 
-          const totalHoursNum = attendance.punchOut
-            ? (attendance.punchOut - attendance.punchIn) / 3600000
+          const hours = attendance.punchOut
+            ? (normalize(attendance.punchOut) - normalize(attendance.punchIn)) /
+              3600000
             : 0;
 
-          if (
-            attendance.punchOut &&
-            totalHoursNum > 0 &&
-            totalHoursNum < HALF_DAY_HOURS
-          ) {
+          if (attendance.punchOut && hours > 0 && hours < HALF_DAY_HOURS) {
             status = 'Half Day';
             halfDayCount++;
           }
@@ -412,16 +435,15 @@ export const attendanceController = {
     }
   },
 
-  // 🔹 Custom Attendance Report
+  // 🔹 Custom Attendance Report (Month / Year / Range)
   getCustomAttendanceReport: async (req, res, next) => {
     try {
       const { year, month, date } = req.query;
 
-      if (!date && !year) {
+      if (!date && !year)
         throw CustomError.badRequest(
           'A valid `date` or `year` query parameter is required.'
         );
-      }
 
       const orgId = req.user._id;
       let startDate;
@@ -432,21 +454,15 @@ export const attendanceController = {
         if (isNaN(targetDate.getTime()))
           throw CustomError.badRequest('Invalid date format provided.');
 
-        startDate = new Date(targetDate.setHours(0, 0, 0, 0));
-        endDate = new Date(targetDate.setHours(23, 59, 59, 999));
+        startDate = normalize(new Date(targetDate.setHours(0, 0, 0, 0)));
+        endDate = normalize(new Date(targetDate.setHours(23, 59, 59, 999)));
       } else {
-        if (isNaN(parseInt(year)))
-          throw CustomError.badRequest('A valid year is required.');
-
-        if (month && (month < 1 || month > 12))
-          throw CustomError.badRequest('Month must be 1–12');
-
         if (month) {
-          startDate = new Date(year, month - 1, 1);
-          endDate = new Date(year, month, 0, 23, 59, 59, 999);
+          startDate = normalize(new Date(year, month - 1, 1));
+          endDate = normalize(new Date(year, month, 0, 23, 59, 59, 999));
         } else {
-          startDate = new Date(year, 0, 1);
-          endDate = new Date(year, 11, 31, 23, 59, 59, 999);
+          startDate = normalize(new Date(year, 0, 1));
+          endDate = normalize(new Date(year, 11, 31, 23, 59, 59, 999));
         }
       }
 
@@ -454,12 +470,13 @@ export const attendanceController = {
       const employeeIds = allEmployees.map((e) => e._id);
 
       let totalWorkingDays = 0;
+
       for (
         let d = new Date(startDate);
         d <= endDate;
         d.setDate(d.getDate() + 1)
       )
-        if (!isWeekend(d)) totalWorkingDays++;
+        if (!isSunday(d) && !isHoliday(d)) totalWorkingDays++;
 
       const attendances = await Attendance.find({
         user: { $in: employeeIds },
@@ -484,10 +501,14 @@ export const attendanceController = {
           d <= endDate;
           d.setDate(d.getDate() + 1)
         ) {
-          if (isWeekend(d)) continue;
+          if (isSunday(d) || isHoliday(d)) continue;
 
-          const dayStart = new Date(new Date(d).setHours(0, 0, 0, 0));
-          const dayEnd = new Date(new Date(d).setHours(23, 59, 59, 999));
+          const dayStart = normalize(
+            new Date(new Date(d).setHours(0, 0, 0, 0))
+          );
+          const dayEnd = normalize(
+            new Date(new Date(d).setHours(23, 59, 59, 999))
+          );
 
           const isOnLeave = leaves.some(
             (l) =>
@@ -509,26 +530,23 @@ export const attendanceController = {
           } else {
             present++;
 
+            const [h, m] = SHIFT_START_TIME.split(':');
             const shiftTime = new Date(dayStart);
-            const [sh, sm] = SHIFT_START_TIME.split(':');
-            shiftTime.setHours(sh, sm);
+            shiftTime.setHours(h, m);
 
-            if (att.punchIn > shiftTime) late++;
+            if (normalize(att.punchIn) > normalize(shiftTime)) late++;
 
             const hours = att.punchOut
-              ? (att.punchOut - att.punchIn) / 3600000
+              ? (normalize(att.punchOut) - normalize(att.punchIn)) / 3600000
               : 0;
 
             if (hours > 0 && hours < HALF_DAY_HOURS) halfDays++;
           }
         }
 
-        const leavesCount = leaves.filter((l) => l.user.equals(emp._id)).length;
-        const effectiveWorkingDays = totalWorkingDays - leavesCount;
-
         const attendancePercentage =
-          effectiveWorkingDays > 0
-            ? Math.round((present / effectiveWorkingDays) * 100)
+          totalWorkingDays > 0
+            ? Math.round((present / totalWorkingDays) * 100)
             : 0;
 
         return {
@@ -542,40 +560,9 @@ export const attendanceController = {
         };
       });
 
-      const employeesWithFullAttendance = employeeReport.filter(
-        (r) => r.absent === 0 && r.late === 0 && r.halfDays === 0
-      ).length;
-
-      let daysWithFullAttendance = 0;
-
-      for (
-        let d = new Date(startDate);
-        d <= endDate;
-        d.setDate(d.getDate() + 1)
-      ) {
-        if (isWeekend(d)) continue;
-
-        const dayStart = new Date(new Date(d).setHours(0, 0, 0, 0));
-        const dayEnd = new Date(new Date(d).setHours(23, 59, 59, 999));
-
-        const presentCount = attendances.filter(
-          (a) => a.punchIn >= dayStart && a.punchIn <= dayEnd
-        ).length;
-
-        const onLeaveCount = leaves.filter(
-          (l) =>
-            new Date(l.startDate) <= dayEnd && new Date(l.endDate) >= dayStart
-        ).length;
-
-        if (presentCount + onLeaveCount === allEmployees.length)
-          daysWithFullAttendance++;
-      }
-
       Response(res, 'Custom attendance report fetched', {
         summary: {
           totalWorkingDays,
-          employeesWithFullAttendance,
-          daysWithFullAttendance,
         },
         report: employeeReport,
       });
