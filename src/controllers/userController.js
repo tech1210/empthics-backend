@@ -43,6 +43,11 @@ export const userController = {
       if (result?.photoUrl)
         result.photoUrlPresigned = await generatePresignedUrl(result.photoUrl);
 
+      if (result?.resumeUrl)
+        result.resumeUrlPresigned = await generatePresignedUrl(
+          result.resumeUrl
+        );
+
       Response(res, 'Success', result);
     } catch (e) {
       next(e);
