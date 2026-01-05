@@ -209,12 +209,17 @@ export const attendanceController = {
         status: 'Active',
       });
 
+      const empIds = await Employee.distinct('_id', {
+        orgId: req.user._id,
+      });
+
       const today = moment().tz(IST);
       const startOfDay = today.clone().startOf('day').toDate();
       const endOfDay = today.clone().endOf('day').toDate();
 
       const presentToday = await Attendance.distinct('user', {
         punchIn: { $gte: startOfDay, $lte: endOfDay },
+        user: { $in: empIds },
       });
 
       const employeeList = await Employee.find({ orgId: req.user._id })
