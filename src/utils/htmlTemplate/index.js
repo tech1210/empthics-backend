@@ -69,12 +69,6 @@ export const employeeCreationTemplate = (data) => `
       </div>
 
       <p style="font-size:14px; color:#444; line-height:1.7;">
-         <strong>Security Note:</strong><br/>
-        Please log in to your account and change your password immediately after your first login to
-        ensure the security of your account.
-      </p>
-
-      <p style="font-size:14px; color:#444; line-height:1.7;">
         If you require any assistance or face any difficulty while logging in, please feel free to
         reach out to the HR or IT support team.
       </p>
@@ -125,14 +119,14 @@ export const organizationEmailVerificationTemplate = (
 <body style="margin:0; padding:0; background:#f4f6fa; font-family:Arial, Helvetica, sans-serif;">
     <div style="padding:25px 0;">
         <div class="container" style="
-      max-width:650px;
-      margin:auto;
-      background:#ffffff;
-      border-radius:10px;
-      padding:28px;
-      box-shadow:0 4px 16px rgba(0,0,0,0.08);
-      border:1px solid #eaeaea;
-    ">
+            max-width:650px;
+            margin:auto;
+            background:#ffffff;
+            border-radius:10px;
+            padding:28px;
+            box-shadow:0 4px 16px rgba(0,0,0,0.08);
+            border:1px solid #eaeaea;
+        ">
 
             <div style="text-align:center; margin-bottom:18px;">
                 <h2 style="margin:0; color:#00325f; font-size:22px;">
@@ -148,41 +142,41 @@ export const organizationEmailVerificationTemplate = (
 
             <p style="font-size:15px; color:#444; line-height:1.7;">
                 Welcome aboard! 🎉 <br />
-                Your registration is almost complete.<br />
-               Please complete the email verification process to activate your account and log in.
+                Your registration with <strong>Empthics</strong> has been successfully initiated and is almost complete.<br />
+                To activate your account and access the platform, please verify your email address by clicking the button below.
             </p>
 
             <div style="text-align:center; margin:28px 0;">
                 <a href="${url}" style="
-            background:#00325f;
-            color:#ffffff;
-            padding:12px 22px;
-            font-size:15px;
-            text-decoration:none;
-            border-radius:6px;
-            display:inline-block;
-            font-weight:600;
-            letter-spacing:0.3px;
-          ">
+                    background:#00325f;
+                    color:#ffffff;
+                    padding:12px 22px;
+                    font-size:15px;
+                    text-decoration:none;
+                    border-radius:6px;
+                    display:inline-block;
+                    font-weight:600;
+                    letter-spacing:0.3px;
+                ">
                     Verify Email
                 </a>
             </div>
 
             <p style="font-size:14px; color:#555; line-height:1.6;">
-                This verification link is valid for a limited time.
-                If you did not initiate this registration, please ignore this email.
+                Please note that this verification link is valid for a limited time (12 hours).<br/>
+                If you did not initiate this registration, you may safely ignore this email.
             </p>
 
             <p style="font-size:15px; color:#333; margin-top:25px;">
-                Regards,<br />
-                <strong>EMPTHICS</strong>
+                Warm regards,<br />
+                <strong>Team Empthics</strong>
             </p>
 
             <hr style="border:none; border-top:1px solid #eeeeee; margin:22px 0;" />
 
             <div style="text-align:center;">
                 <p style="font-size:12px; color:#888;">
-                    Need help? Contact support anytime.<br />
+                    Need assistance? Our support team is always here to help.<br />
                     © ${new Date().getFullYear()} Empthics — All Rights Reserved
                 </p>
             </div>

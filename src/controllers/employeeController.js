@@ -158,7 +158,7 @@ export const employeeController = {
 
       await sendEmail(
         employee.email,
-        `Welcome to [${req.user.name}]! Your Employee Account Details`,
+        `Welcome to ${req.user.name}! Your Employee Account Details`,
         htmlContent
       );
 
