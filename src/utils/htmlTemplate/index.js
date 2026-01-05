@@ -65,6 +65,12 @@ export const employeeCreationTemplate = (data) => `
         <p><strong>Name:</strong> ${data.name}</p>
         <p><strong>Designation:</strong> ${data.designation || 'N/A'}</p>
         <p><strong>Login ID:</strong> ${data.loginId}</p>
+        <p style="font-size:14px;margin-top:15px;">
+            <strong>URL :</strong> 
+            <a href="https://www.empthics.com/login" target="_blank">
+              HRMS LOGIN LINK
+            </a>
+        </p>
         <p><strong>Password:</strong> ${data.password}</p>
       </div>
 
