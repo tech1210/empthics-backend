@@ -94,6 +94,17 @@ export const attendanceController = {
           .tz(IST)
           .format('YYYY-MM-DD');
 
+        // ========= MINIMUM 1 MINUTE GAP CHECK =========
+        const diffMs = now.getTime() - new Date(openRecord.punchIn).getTime();
+        const diffSeconds = diffMs / 1000;
+
+        if (diffSeconds < 60) {
+          throw CustomError.badRequest(
+            'Please wait at least 1 minute before punching out.'
+          );
+        }
+        // =============================================
+
         if (recordDay === todayStr) {
           openRecord.punchOut = now;
           openRecord.punchOutLocation = { latitude, longitude, address };
