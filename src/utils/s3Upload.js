@@ -22,15 +22,16 @@ export const uploadS3File = multer({
     s3,
     bucket: S3_BUCKET_NAME,
 
+    // 🔥 IMPORTANT: store correct Content-Type in S3
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+
     key: async function (req, file, cb) {
       try {
         const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-
         const ext = path
           .extname(file.originalname)
           .toLowerCase()
           .replace('.', '');
-
         const key = `${uniqueName}.${ext}`;
 
         // Presigned URL params
@@ -38,9 +39,12 @@ export const uploadS3File = multer({
           Bucket: S3_BUCKET_NAME,
           Key: key,
           Expires: 60 * 60 * 5, // 5 hours
+
+          // 🔥 Force browser to open instead of download
+          ResponseContentDisposition: 'inline',
         };
 
-        // Optional Content-Type
+        // Optional Content-Type override if needed
         if (ext === 'pdf') params.ResponseContentType = 'application/pdf';
         else if (ext === 'jpg' || ext === 'jpeg')
           params.ResponseContentType = 'image/jpeg';
@@ -67,23 +71,36 @@ export const uploadS3File = multer({
   limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB
 });
 
-// ================= Generate Presigned URL From Stored URL =================
-export const generatePresignedUrl = async (url, expiresInSeconds = 60 * 10) => {
+// ================= Generate Presigned URL For Existing Stored URL =================
+export const generatePresignedUrl = async (
+  storedUrl,
+  expiresInSeconds = 60 * 10
+) => {
   try {
-    if (!url) return '';
+    if (!storedUrl) return '';
 
-    // extract object key from URL
-    const key = url.split('/').pop();
+    // 🔥 Safe key extraction (supports folders + CloudFront + query params)
+    let key = storedUrl;
+
+    if (storedUrl.includes('.amazonaws.com/')) {
+      key = storedUrl.split('.amazonaws.com/')[1].split('?')[0];
+    } else {
+      // fallback if plain key stored
+      key = storedUrl.split('/').pop();
+    }
+
+    key = decodeURIComponent(key);
 
     const params = {
       Bucket: S3_BUCKET_NAME,
       Key: key,
-      Expires: expiresInSeconds, // default 10 mins
+      Expires: expiresInSeconds,
+
+      // 🔥 again make sure OPEN not DOWNLOAD
+      ResponseContentDisposition: 'inline',
     };
 
-    const signedUrl = await s3.getSignedUrlPromise('getObject', params);
-
-    return signedUrl;
+    return await s3.getSignedUrlPromise('getObject', params);
   } catch (err) {
     console.error('Error generating presigned URL:', err);
     return '';
