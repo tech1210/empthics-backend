@@ -3,6 +3,7 @@ import User from '../models/user.js';
 
 import { Response } from '../utils/index.js';
 import CustomError from '../utils/CustomError.js';
+import { generatePresignedUrl } from '../utils/s3Upload.js';
 
 export const userController = {
   getAllUsers: async (req, res, next) => {
@@ -34,9 +35,13 @@ export const userController = {
   getUserProfile: async (req, res, next) => {
     try {
       const userId = req.user._id;
-      let result = await User.findOne({ _id: userId });
+      let result = await User.findOne({ _id: userId }).lean();
 
-      if (!result) result = await Employee.findOne({ _id: userId });
+      if (!result) result = await Employee.findOne({ _id: userId }).lean();
+
+      result = JSON.parse(JSON.stringify(result));
+      if (result?.photoUrl)
+        result.photoUrlPresigned = await generatePresignedUrl(result.photoUrl);
 
       Response(res, 'Success', result);
     } catch (e) {
