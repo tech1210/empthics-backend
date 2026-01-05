@@ -21,7 +21,7 @@ export const authController = {
     try {
       let { name, email, phone, password, role = 'organization' } = req.body;
 
-      throw CustomError.badRequest('New Registration not allowed!');
+      // throw CustomError.badRequest('New Registration not allowed!');
 
       email = email.toLowerCase().trim();
       name = name.trim();
