@@ -235,7 +235,7 @@ export const attendanceController = {
 
       const employeeList = await Employee.find({ orgId: req.user._id })
         .sort({ createdAt: -1 })
-        .limit(20);
+        .limit(30);
 
       return Response(res, 'Dashboard data fetched successfully', {
         totalEmployees,
