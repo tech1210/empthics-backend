@@ -129,6 +129,7 @@ export const attendanceController = {
   },
 
   // 🔹 Attendance Summary for logged-in employee (unchanged UI but more accurate)
+  // 🔹 Attendance Summary for logged-in employee (Updated Day-wise Hours Worked)
   getAttendanceSummary: async (req, res, next) => {
     try {
       const userId = req.user._id;
@@ -160,25 +161,45 @@ export const attendanceController = {
 
       const totalRecords = await Attendance.countDocuments(filter);
 
-      let totalMinutes = 0;
-      attendanceRecords.forEach((rec) => {
-        if (rec.punchIn && rec.punchOut) {
-          const s = normalize(rec.punchIn);
-          const e = normalize(rec.punchOut);
-          totalMinutes += (e - s) / 60000;
+      // =====================================================
+      // 🔥 DAY WISE hoursWorked FIX IMPLEMENTED HERE
+      // =====================================================
+      const todayStart = moment().tz(IST).startOf('day').toDate();
+      const todayEnd = moment().tz(IST).endOf('day').toDate();
+
+      const todayRecord = await Attendance.findOne({
+        user: userId,
+        punchIn: { $gte: todayStart, $lte: todayEnd },
+      }).sort({ punchIn: -1 });
+
+      let hoursWorked = '0h 0m';
+      let isPunchedIn = false;
+      let punchInTime = '';
+
+      if (todayRecord) {
+        punchInTime = formatTime(todayRecord.punchIn);
+
+        // punched in but not out -> live running time
+        if (!todayRecord.punchOut) {
+          isPunchedIn = true;
+
+          const start = normalize(todayRecord.punchIn);
+          const now = normalize(new Date());
+
+          const duration = moment.duration(moment(now).diff(moment(start)));
+          const minutes = parseInt(duration.asMinutes(), 10);
+
+          hoursWorked = `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
+        } else {
+          // punched out -> final hours
+          hoursWorked = calculateTotalHours(
+            todayRecord.punchIn,
+            todayRecord.punchOut
+          );
         }
-      });
+      }
 
-      const totalHours = Math.floor(totalMinutes / 60);
-      const remainingMinutes = totalMinutes % 60;
-      const hoursWorked = `${totalHours}h ${remainingMinutes}m`;
-
-      const latestRecord = await Attendance.findOne({ user: userId }).sort({
-        punchIn: -1,
-      });
-
-      const isPunchedIn = latestRecord ? !latestRecord.punchOut : false;
-      const punchInTime = latestRecord ? formatTime(latestRecord.punchIn) : '';
+      // =====================================================
 
       const recentAttendance = attendanceRecords.map((att) => ({
         date: formatDate(att.punchIn),
@@ -194,17 +215,22 @@ export const attendanceController = {
         isRegularizationEnabled,
         dateRange: { start, end },
         filterStatus: status || 'All',
+
+        // 🔥 Correct Now
         isPunchedIn,
         punchIn: punchInTime,
         hoursWorked,
+
         leavesLeft: 0,
         pendingLeaveRequests: 0,
+
         pagination: {
           page,
           limit,
           totalRecords,
           totalPages: Math.ceil(totalRecords / limit),
         },
+
         recentAttendance,
       });
     } catch (e) {
