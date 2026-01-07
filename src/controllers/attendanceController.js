@@ -128,7 +128,7 @@ export const attendanceController = {
     }
   },
 
-  // 🔹 Attendance Summary for logged-in employee
+  // 🔹 Attendance Summary for logged-in employee (unchanged UI but more accurate)
   getAttendanceSummary: async (req, res, next) => {
     try {
       const userId = req.user._id;
@@ -160,17 +160,11 @@ export const attendanceController = {
 
       const totalRecords = await Attendance.countDocuments(filter);
 
-      // ==================================================
-      // 🔥 ONLY CHANGE DONE HERE --> hoursWorked supports live time
-      // ==================================================
       let totalMinutes = 0;
-
       attendanceRecords.forEach((rec) => {
-        if (rec.punchIn) {
+        if (rec.punchIn && rec.punchOut) {
           const s = normalize(rec.punchIn);
-          const e = rec.punchOut
-            ? normalize(rec.punchOut)
-            : normalize(new Date()); // <-- LIVE running time
+          const e = normalize(rec.punchOut);
           totalMinutes += (e - s) / 60000;
         }
       });
@@ -178,8 +172,6 @@ export const attendanceController = {
       const totalHours = Math.floor(totalMinutes / 60);
       const remainingMinutes = totalMinutes % 60;
       const hoursWorked = `${totalHours}h ${remainingMinutes}m`;
-
-      // ==================================================
 
       const latestRecord = await Attendance.findOne({ user: userId }).sort({
         punchIn: -1,
@@ -204,7 +196,7 @@ export const attendanceController = {
         filterStatus: status || 'All',
         isPunchedIn,
         punchIn: punchInTime,
-        hoursWorked, // <-- NOW LIVE VALUE
+        hoursWorked,
         leavesLeft: 0,
         pendingLeaveRequests: 0,
         pagination: {
